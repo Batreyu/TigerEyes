@@ -8,14 +8,22 @@ import android.location.LocationListener;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 public class Main extends Activity {
+    private LocationManager mgr=null;
+    private LocationListener listener = null;
+    private Location lastKnownLocation = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mgr=(LocationManager)getSystemService(LOCATION_SERVICE);
+        listener = new MyLocationListener();
+        mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,listener);
+
     }
 
 
@@ -51,8 +59,35 @@ public class Main extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-MyLocation loc = new MyLocation();
+private class MyLocationListener implements LocationListener{
 
+        @Override
+        public void onLocationChanged(final Location location) {
+            lastKnownLocation = location;
 
+            String longitude = "Longitude: " + location.getLongitude();
+            //Log.v(TAG, longitude);
+            String latitude = "Latitude: " + location.getLatitude();
+            //Log.v(TAG, latitude);
+           TextView txtLat = (TextView) findViewById(R.id.textview1);
+            txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+        }
 
+        @Override
+        public void onProviderDisabled(final String provider) {
+
+        }
+        @Override
+        public void onProviderEnabled(final String provider) {
+
+        }
+
+        @Override
+        public void onStatusChanged(final String provider, final int status, final Bundle extras) {
+
+        }
+    };
 }
+
+
+

@@ -1,6 +1,6 @@
 package geocaching3700.tigereyes;
 
-
+//CURRENTLY NOT USED
         import android.os.Bundle;
         import android.app.Activity;
         import android.content.Context;
@@ -50,4 +50,5 @@ public class MyLocation extends Activity implements LocationListener{
     public void onStatusChanged(String provider, int status, Bundle extras) {
         Log.d("Latitude","status");
     }
+
 }
