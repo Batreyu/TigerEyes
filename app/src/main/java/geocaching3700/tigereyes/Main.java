@@ -1,29 +1,46 @@
 package geocaching3700.tigereyes;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.content.Intent;
 import android.location.*;
-import android.location.LocationListener;
 import android.provider.Settings;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.*;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.View.*;
+import android.widget.ImageButton;
+
 
 
 public class Main extends Activity {
-    private LocationManager mgr=null;
-    private LocationListener listener = null;
-    private Location lastKnownLocation = null;
+    ImageButton startNav = null;
+    ImageButton myLocations = null;
+    ImageButton viewGallery = null;
+    Activity activity = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
-        mgr=(LocationManager)getSystemService(LOCATION_SERVICE);
-        listener = new MyLocationListener();
-        mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,listener);
+        getActionBar().hide();
+        //initialize buttons with layout elements
+        startNav = (ImageButton) findViewById(R.id.start_navigation);
+        myLocations = (ImageButton) findViewById(R.id.locations);
+        viewGallery = (ImageButton) findViewById(R.id.gallery);
 
+        //set listener for click, start new activity
+        startNav.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+              //  v.setAnimation(AnimationUtils.loadAnimation(this, R.anim.image_click));
+                Intent intent = new Intent(Main.this, StartNavigation.class);
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -35,9 +52,9 @@ public class Main extends Activity {
         boolean enabled = service
                 .isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-// check if enabled and if not send user to the GSP settings
-// Better solution would be to display a dialog and suggesting to
-// go to the settings
+        // check if GPS is enabled and if not send user to the GSP settings
+        // Better solution would be to display a dialog and suggesting to
+        // go to the settings. Will implement later
         if (!enabled) {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             startActivity(intent);
@@ -59,34 +76,6 @@ public class Main extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-private class MyLocationListener implements LocationListener{
-
-        @Override
-        public void onLocationChanged(final Location location) {
-            lastKnownLocation = location;
-
-            String longitude = "Longitude: " + location.getLongitude();
-            //Log.v(TAG, longitude);
-            String latitude = "Latitude: " + location.getLatitude();
-            //Log.v(TAG, latitude);
-           TextView txtLat = (TextView) findViewById(R.id.textview1);
-            txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
-        }
-
-        @Override
-        public void onProviderDisabled(final String provider) {
-
-        }
-        @Override
-        public void onProviderEnabled(final String provider) {
-
-        }
-
-        @Override
-        public void onStatusChanged(final String provider, final int status, final Bundle extras) {
-
-        }
-    };
 }
 
 
