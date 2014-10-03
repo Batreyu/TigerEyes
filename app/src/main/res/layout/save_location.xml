@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+
+
+
+    <EditText
+        android:id = "@+id/edittext"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <LinearLayout
+        android:layout_below="@+id/edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+    <Button
+        android:id="@+id/dialogButtonCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" Cancel "
+        android:layout_gravity="left|center"
+        android:layout_weight="1"
+        android:layout_marginTop="5dp"
+        />
+
+    <Button
+        android:id="@+id/dialogButtonOK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" OK "
+        android:layout_gravity="right|center"
+        android:layout_weight="1"
+        android:layout_marginTop="5dp"
+        android:layout_centerInParent="true"
+        android:layout_toRightOf="@+id/dialogButtonCancel"
+        />
+    </LinearLayout>
+</RelativeLayout>

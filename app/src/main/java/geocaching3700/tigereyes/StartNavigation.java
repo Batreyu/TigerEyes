@@ -2,6 +2,7 @@ package geocaching3700.tigereyes;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,6 +20,7 @@ public class StartNavigation extends Activity {
         private LocationManager mgr=null;
         private LocationListener listener = null;
         private Location lastKnownLocation = null;
+    private SharedPreferences settings;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,12 @@ public class StartNavigation extends Activity {
                 //Log.v(TAG, latitude);
                 TextView txtLat = (TextView) findViewById(R.id.textview1);
                 txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+
+                settings = getSharedPreferences("settings", MODE_WORLD_WRITEABLE);
+                SharedPreferences.Editor prefEditor = settings.edit();
+                prefEditor.putFloat("Latitude", (float) location.getLatitude());
+                prefEditor.putFloat("Longitude", (float)location.getLongitude());
+                prefEditor.commit();
             }
 
             @Override

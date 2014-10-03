@@ -27,13 +27,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".StartNavigation"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.StartNavigation" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        android:name=".StartNavigation"
+        android:label="@string/app_name" >
+        <intent-filter>
+            <action android:name="android.intent.action.StartNavigation" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+
 
     </application>
 

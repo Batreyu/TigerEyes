@@ -11,6 +11,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.View.*;
 import android.widget.ImageButton;
+import android.content.SharedPreferences;
 
 
 
@@ -19,6 +20,8 @@ public class Main extends Activity {
     ImageButton myLocations = null;
     ImageButton viewGallery = null;
     Activity activity = this;
+    private SharedPreferences settings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,7 @@ public class Main extends Activity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
         getActionBar().hide();
+        settings = getSharedPreferences("settings", MODE_WORLD_WRITEABLE);
         //initialize buttons with layout elements
         startNav = (ImageButton) findViewById(R.id.start_navigation);
         myLocations = (ImageButton) findViewById(R.id.locations);
@@ -38,6 +42,15 @@ public class Main extends Activity {
             public void onClick(View v) {
               //  v.setAnimation(AnimationUtils.loadAnimation(this, R.anim.image_click));
                 Intent intent = new Intent(Main.this, StartNavigation.class);
+                startActivity(intent);
+            }
+        });
+        myLocations.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //  v.setAnimation(AnimationUtils.loadAnimation(this, R.anim.image_click));
+                Intent intent = new Intent(Main.this, MyLocation.class);
                 startActivity(intent);
             }
         });
