@@ -4,15 +4,41 @@
     android:layout_height="fill_parent">
 
 
-    <EditText
-        android:id="@+id/edittext"
+    <TextView
+        android:id="@+id/title"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="CacheTitle" />
+
+    <TextView
+        android:id="@+id/coords"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:padding="10dp"
+        android:text="This cache is located at LAT XX, LONG XX" />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/coords"
+        android:padding="10dp"
+        android:text="You are 2.4 miles away from this cache" />
+
+    <TextView
+        android:id="@+id/direction"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/distance"
+        android:padding="10dp"
+        android:text="Direction to travel: NW" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/edittext"
+        android:layout_below="@+id/direction"
         android:orientation="horizontal"
         android:paddingBottom="10dp">
 
@@ -34,6 +60,6 @@
             android:layout_marginTop="5dp"
             android:layout_toRightOf="@+id/dialogButtonCancel"
             android:layout_weight="1"
-            android:text=" OK " />
+            android:text=" GO " />
     </LinearLayout>
 </RelativeLayout>
