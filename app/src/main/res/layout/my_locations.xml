@@ -3,20 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/topbar"
+
+    <ListView
+        android:id="@+id/cachelist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/saveloc"
+        android:layout_alignParentTop="true"
+        android:choiceMode="singleChoice" />
+
+    <Button
+        android:id="@+id/saveloc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="15dp"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="right|center"
         android:gravity="center_horizontal"
-        android:text = "Save current location"/>
-
-
-    <ListView android:id="@+id/cachelist"
-        android:layout_below="@+id/topbar"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:choiceMode="singleChoice"
-        />
+        android:text="Save Current Location" />
 
 </RelativeLayout>
