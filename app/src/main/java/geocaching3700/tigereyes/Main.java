@@ -1,18 +1,20 @@
 package geocaching3700.tigereyes;
 
 import android.app.Activity;
-import android.content.Context;
-import android.os.Bundle;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.*;
-import android.provider.Settings;
-import android.view.*;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.View.*;
-import android.widget.ImageButton;
 import android.content.SharedPreferences;
-
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 
 public class Main extends Activity {
@@ -40,7 +42,7 @@ public class Main extends Activity {
 
             @Override
             public void onClick(View v) {
-              //  v.setAnimation(AnimationUtils.loadAnimation(this, R.anim.image_click));
+                //  v.setAnimation(AnimationUtils.loadAnimation(this, R.anim.image_click));
                 Intent intent = new Intent(Main.this, StartNavigation.class);
                 startActivity(intent);
             }
@@ -69,8 +71,28 @@ public class Main extends Activity {
         // Better solution would be to display a dialog and suggesting to
         // go to the settings. Will implement later
         if (!enabled) {
-            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(intent);
+            final AlertDialog.Builder d = new AlertDialog.Builder(Main.this);
+            d.setCancelable(true);
+            d.setMessage("You must enable location services to use this application.");
+            d.setPositiveButton("Go to settings", new DialogInterface.OnClickListener() {
+                @Override
+
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                    dialogInterface.dismiss();
+                }
+            });
+            d.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Toast.makeText(getApplicationContext(), "You must enable location services in your settings",
+                            Toast.LENGTH_LONG).show();
+                    dialogInterface.dismiss();
+                }
+            });
+            final AlertDialog dialog = d.create();
+            dialog.show();
         }
 
 

@@ -29,7 +29,12 @@ public class StartNavigation extends Activity {
             mgr=(LocationManager)getSystemService(LOCATION_SERVICE);
             listener = new MyLocationListener();
             mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,listener);
-
+            settings = getSharedPreferences("settings", MODE_WORLD_WRITEABLE);
+            float destLat = settings.getFloat("destLatitude", 0);
+            float destLon = settings.getFloat("destLongitude", 0);
+            TextView destCoords = (TextView) findViewById(R.id.destcoords);
+            String destCoordsString = "Latitude: " + Float.toString(destLat) + ", Longitude: " + Float.toString(destLon);
+            destCoords.setText(destCoordsString);
         }
 
 
@@ -75,13 +80,13 @@ public class StartNavigation extends Activity {
                 //Log.v(TAG, longitude);
                 String latitude = "Latitude: " + location.getLatitude();
                 //Log.v(TAG, latitude);
-                TextView txtLat = (TextView) findViewById(R.id.textview1);
-                txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+                TextView currentCoords = (TextView) findViewById(R.id.currentCoordText);
+                currentCoords.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
 
-                settings = getSharedPreferences("settings", MODE_WORLD_WRITEABLE);
+
                 SharedPreferences.Editor prefEditor = settings.edit();
-                prefEditor.putFloat("Latitude", (float) location.getLatitude());
-                prefEditor.putFloat("Longitude", (float)location.getLongitude());
+                prefEditor.putFloat("currentLatitude", (float) location.getLatitude());
+                prefEditor.putFloat("currentLongitude", (float) location.getLongitude());
                 prefEditor.commit();
             }
 
