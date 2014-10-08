@@ -8,18 +8,34 @@ public class Cache {
     private String title;
     private float latitude;
     private float longitude;
+    private boolean completed;
+
+    //modified version of Mack's
+    //will return four values, float highDegreeLat, float highDegreeLong, float lowDegreeLat, float lowDegreeLong
+    public static String[] calcDistance() {
+        return new String[] {};
+    }
 
     public Cache(String  titleIn, float latitudeIn, float longitudeIn) {
         title = titleIn;
         latitude = latitudeIn;
         longitude = longitudeIn;
+        completed = false;
     }
 
-    public Cache(int idIn, String  titleIn, float latitudeIn, float longitudeIn) {
+    public Cache(String  titleIn, float latitudeIn, float longitudeIn, boolean completedIn) {
+        title = titleIn;
+        latitude = latitudeIn;
+        longitude = longitudeIn;
+        completed = completedIn;
+    }
+
+    public Cache(int idIn, String  titleIn, float latitudeIn, float longitudeIn, boolean completedIn) {
         id = idIn;
         title = titleIn;
         latitude = latitudeIn;
         longitude = longitudeIn;
+        completed = completedIn;
     }
 
     public void setId(long idIn) {
@@ -52,5 +68,13 @@ public class Cache {
 
     public float getLon() {
         return longitude;
+    }
+
+    public void setCompleted(boolean completedIn) {
+        completed = completedIn;
+    }
+
+    public boolean getCompleted() {
+        return completed;
     }
 }
