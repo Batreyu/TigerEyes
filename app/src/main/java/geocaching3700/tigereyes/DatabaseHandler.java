@@ -111,11 +111,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     //Getting all caches within radius (in degrees)
     //Should return a square radius, not a circle radius...it's not perfect :(
-    public ArrayList<Cache> getWithin(String[] degrees) {
+    public ArrayList<Cache> getWithin(String[] bounds) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CACHES, new String[] { KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED },
                 KEY_LATITUDE + "<=? AND " + KEY_LONGITUDE + "<=? AND " + KEY_LATITUDE + ">=? AND " + KEY_LONGITUDE + ">=?",
-                degrees, null, null, KEY_TITLE + "DESC", null );
+                bounds, null, null, KEY_TITLE + "DESC", null );
         ArrayList<Cache> caches = new ArrayList<Cache>();
         if (cursor.moveToFirst()) {
             do {

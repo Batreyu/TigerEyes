@@ -81,4 +81,41 @@ public class Map extends FragmentActivity {
             d = d / 1.609344; // d from km to mi
             return d;
         }
+
+    /* will return four values, float highDegreeLat, float highDegreeLong, float lowDegreeLat, float lowDegreeLong
+     * plug straight into the getWithin() method
+     *
+     * taken from http://JanMatuschek.de/LatitudeLongitudeBoundingCoordinates#Java
+     */
+    public static String[] calcBounds(double distance, float curLat, float curLon) {
+        double R = 3958.8; // miles
+        double MIN_LAT = Math.toRadians(-90d);  // -PI/2
+        double MAX_LAT = Math.toRadians(90d);   //  PI/2
+        double MIN_LON = Math.toRadians(-180d); // -PI
+        double MAX_LON = Math.toRadians(180d);  //  PI
+
+        //distance in radians
+        double radDist = distance / R;
+        double minLat = curLat - radDist;
+        double maxLat = curLat + radDist;
+
+        double minLon;
+        double maxLon;
+        if (minLat > MIN_LAT && maxLat < MAX_LAT) {
+            double deltaLon = Math.asin(Math.sin(radDist) / Math.cos(curLat));
+            minLon = curLon - deltaLon;
+            if (minLon < MIN_LON) minLon += 2d * Math.PI;
+            maxLon = curLon + deltaLon;
+            if (maxLon > MAX_LON) maxLon -= 2d * Math.PI;
+        }
+        else {
+            // a pole is within the distance
+            minLat = Math.max(minLat, MIN_LAT);
+            maxLat = Math.min(maxLat, MAX_LAT);
+            minLon = MIN_LON;
+            maxLon = MAX_LON;
+        }
+        return new String[] { String.valueOf(maxLat), String.valueOf(maxLon),
+                String.valueOf(minLat), String.valueOf(minLon) };
+    }
  }

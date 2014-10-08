@@ -10,12 +10,6 @@ public class Cache {
     private float longitude;
     private boolean completed;
 
-    //modified version of Mack's
-    //will return four values, float highDegreeLat, float highDegreeLong, float lowDegreeLat, float lowDegreeLong
-    public static String[] calcDistance() {
-        return new String[] {};
-    }
-
     public Cache(String  titleIn, float latitudeIn, float longitudeIn) {
         title = titleIn;
         latitude = latitudeIn;
