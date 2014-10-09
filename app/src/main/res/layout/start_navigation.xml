@@ -12,7 +12,7 @@
         android:id="@+id/currentLocationText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="your current location is:" />
+        android:text="your current location is: " />
 
     <TextView
         android:id="@+id/currentCoordText"
