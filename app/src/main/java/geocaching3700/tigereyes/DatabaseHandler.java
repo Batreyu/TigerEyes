@@ -24,6 +24,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_TITLE = "title";
     private static final String KEY_LATITUDE = "latitude";
     private static final String KEY_LONGITUDE = "longitude";
+    private static final String KEY_COMPLETED = "completed";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -34,7 +35,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CACHES_TABLE = "CREATE TABLE " + TABLE_CACHES + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TITLE + " TEXT," + KEY_LATITUDE + " TEXT," +
-                KEY_LONGITUDE + " TEXT" + ")";
+                KEY_LONGITUDE + " TEXT," + KEY_COMPLETED + " TEXT" + ")";
         db.execSQL(CREATE_CACHES_TABLE);
     }
 
@@ -52,21 +53,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_TITLE, cache.getTitle());
         values.put(KEY_LATITUDE, String.valueOf(cache.getLat()));
         values.put(KEY_LONGITUDE, String.valueOf(cache.getLon()));
+        values.put(KEY_COMPLETED, String.valueOf(cache.getCompleted()));
         long rowID = db.insert(TABLE_CACHES, null, values);
         cache.setId(rowID);
         db.close();
     }
 
-    // Getting single cache
+    // Getting single cache by id
     public Cache getCache(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        final Cursor cursor = db.query(TABLE_CACHES, new String[] { KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE }, KEY_ID + "=?",
+        final Cursor cursor = db.query(TABLE_CACHES, new String[] { KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE,
+                        KEY_COMPLETED }, KEY_ID + "=?",
                 new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
             return new Cache(Integer.parseInt(cursor.getString(0)),
-                    cursor.getString(1), Float.parseFloat(cursor.getString(2)), Float.parseFloat(cursor.getString(3)));
+                    cursor.getString(1), Float.parseFloat(cursor.getString(2)), Float.parseFloat(cursor.getString(3)),
+                    Boolean.parseBoolean(cursor.getString(4)));
         }
         return null;
     }
@@ -74,13 +78,50 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Getting all caches
     public ArrayList<Cache> getCaches() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_CACHES, new String[] { KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE}, null,
-                null, null, null, null, null);
+        Cursor cursor = db.query(TABLE_CACHES, new String[] { KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED}, null,
+                null, null, null, KEY_TITLE + "DESC", null);
         ArrayList<Cache> caches = new ArrayList<Cache>();
         if (cursor.moveToFirst()) {
             do {
                 Cache cache = new Cache(Integer.parseInt(cursor.getString(0)), cursor.getString(1),
-                        Float.parseFloat(cursor.getString(2)), Float.parseFloat(cursor.getString(3)));
+                        Float.parseFloat(cursor.getString(2)), Float.parseFloat(cursor.getString(3)),
+                        Boolean.parseBoolean(cursor.getString(4)));
+                caches.add(cache);
+            } while (cursor.moveToNext());
+        }
+        return caches;
+    }
+
+    //Get all uncompleted caches
+    public ArrayList<Cache> getCompletedCaches() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_CACHES, new String[] { KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED },
+                KEY_COMPLETED + "=?", new String[] { String.valueOf(true) }, null, null, KEY_TITLE + "DESC", null);
+        ArrayList<Cache> caches = new ArrayList<Cache>();
+        if (cursor.moveToFirst()) {
+            do {
+                Cache cache = new Cache(Integer.parseInt(cursor.getString(0)), cursor.getString(1),
+                        Float.parseFloat(cursor.getString(2)), Float.parseFloat(cursor.getString(3)),
+                        Boolean.parseBoolean(cursor.getString(4)));
+                caches.add(cache);
+            } while (cursor.moveToNext());
+        }
+        return caches;
+    }
+
+    //Getting all caches within radius (in degrees)
+    //Should return a square radius, not a circle radius...it's not perfect :(
+    public ArrayList<Cache> getWithin(String[] bounds) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_CACHES, new String[] { KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED },
+                KEY_LATITUDE + "<=? AND " + KEY_LONGITUDE + "<=? AND " + KEY_LATITUDE + ">=? AND " + KEY_LONGITUDE + ">=?",
+                bounds, null, null, KEY_TITLE + "DESC", null );
+        ArrayList<Cache> caches = new ArrayList<Cache>();
+        if (cursor.moveToFirst()) {
+            do {
+                Cache cache = new Cache(Integer.parseInt(cursor.getString(0)), cursor.getString(1),
+                        Float.parseFloat(cursor.getString(2)), Float.parseFloat(cursor.getString(3)),
+                        Boolean.parseBoolean(cursor.getString(4)));
                 caches.add(cache);
             } while (cursor.moveToNext());
         }
@@ -96,15 +137,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_TITLE, cache.getTitle());
         values.put(KEY_LATITUDE, String.valueOf(cache.getLat()));
         values.put(KEY_LONGITUDE, String.valueOf(cache.getLon()));
+        values.put(KEY_COMPLETED, String.valueOf(cache.getCompleted()));
 
         db.update(TABLE_CACHES, values, KEY_ID + " = ?", new String[] { String.valueOf(cache.getId()) });
     }
 
     // Deleting single cache
-    public void deleteCache(Cache cache) {
+    // Returns true if a cache has been deleted
+    public boolean deleteCache(Cache cache) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_CACHES, KEY_ID + " = ?",
-        new String[] { String.valueOf(cache.getId()) });
+        boolean value = (db.delete(TABLE_CACHES, KEY_ID + " = ?",
+                new String[] { String.valueOf(cache.getId()) }) > 0);
         db.close();
+        return value;
+    }
+
+    //Delete all completed caches
+    //Returns number of caches deleted
+    public int deleteFinishedCaches() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int deleted = db.delete(TABLE_CACHES, KEY_COMPLETED + "=?", new String[] { String.valueOf(true) });
+        return deleted;
     }
 }
