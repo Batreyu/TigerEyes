@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ public class Main extends Activity {
     ImageButton myLocations = null;
     ImageButton viewGallery = null;
     Activity activity = this;
+    private Map map;
     private SharedPreferences settings;
 
 
@@ -31,7 +33,18 @@ public class Main extends Activity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
         getActionBar().hide();
+        map = new Map();
+
+        //Make sure when starting app not continuing last session, but keep last known location until it updates
         settings = getSharedPreferences("settings", MODE_WORLD_WRITEABLE);
+        SharedPreferences.Editor e = settings.edit();
+        e.putFloat("destLatitude", 0);
+        e.putFloat("destLongitude", 0);
+        e.putLong("bearing", 0);
+        e.putLong("distance", 0);
+        e.putString("distanceUnit", "feet");
+        e.commit();
+
         //initialize buttons with layout elements
         startNav = (ImageButton) findViewById(R.id.start_navigation);
         myLocations = (ImageButton) findViewById(R.id.locations);
@@ -42,7 +55,7 @@ public class Main extends Activity {
 
             @Override
             public void onClick(View v) {
-                //  v.setAnimation(AnimationUtils.loadAnimation(this, R.anim.image_click));
+                v.startAnimation(AnimationUtils.loadAnimation(Main.this, R.anim.click));
                 Intent intent = new Intent(Main.this, StartNavigation.class);
                 startActivity(intent);
             }
@@ -51,7 +64,7 @@ public class Main extends Activity {
 
             @Override
             public void onClick(View v) {
-                //  v.setAnimation(AnimationUtils.loadAnimation(this, R.anim.image_click));
+                v.startAnimation(AnimationUtils.loadAnimation(Main.this, R.anim.click));
                 Intent intent = new Intent(Main.this, MyLocation.class);
                 startActivity(intent);
             }

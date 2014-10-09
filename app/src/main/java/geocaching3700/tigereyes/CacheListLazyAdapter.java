@@ -1,10 +1,13 @@
 package geocaching3700.tigereyes;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,11 +24,15 @@ public class CacheListLazyAdapter extends ArrayAdapter<Cache> {
     private Activity activity;
     private int listitem;
     private ArrayList<Cache> caches;
+    private Context context;
+    private DatabaseHandler db;
 //public ImageLoader imageLoader;
 
     public CacheListLazyAdapter(Context context, int textViewResourceId, ArrayList<Cache> objects) {
         super(context, textViewResourceId, objects);
+        this.context = context;
         caches = objects;
+
     }
 
     public void LazyAdapter(Activity a, int rowID, ArrayList<Cache> cachelist) {
@@ -59,13 +66,44 @@ public class CacheListLazyAdapter extends ArrayAdapter<Cache> {
 
         TextView Name = (TextView) vi.findViewById(R.id.text1); // title of cache
         TextView Desc = (TextView) vi.findViewById(R.id.text2); // desc or location
-        ImageView thumb_image = (ImageView) vi.findViewById(R.id.icon); // image
+        ImageView delete = (ImageView) vi.findViewById(R.id.icon); // image
 
-        Cache thisCache = caches.get(position);
+        final Cache thisCache = caches.get(position);
         Name.setText(thisCache.getTitle());
         String coords = "Latitude: " + thisCache.getLat() + ", Longitude: " + thisCache.getLon();
         Desc.setText(coords);
-        //ADD code to for JSON here
+        //if pressed delete
+        delete.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                v.startAnimation(AnimationUtils.loadAnimation(context, R.anim.click));
+                final AlertDialog.Builder d = new AlertDialog.Builder(context);
+                d.setCancelable(true);
+                d.setMessage("Would you like to delete this cache?");
+                d.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        DatabaseHandler dbh = new DatabaseHandler(context);
+                        dbh.deleteCache(thisCache);
+                        caches = dbh.getCaches();
+                        notifyDataSetChanged();
+                        dialogInterface.dismiss();
+                    }
+                });
+                d.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+                final AlertDialog dialog = d.create();
+                dialog.show();
+            }
+        });
+
+
         return vi;
     }
 }
