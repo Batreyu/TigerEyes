@@ -79,7 +79,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<Cache> getCaches() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CACHES, new String[]{KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED}, null,
-                null, null, null, KEY_TITLE + "DESC", null);
+                null, null, null, KEY_TITLE + " DESC", null);
         ArrayList<Cache> caches = new ArrayList<Cache>();
         if (cursor.moveToFirst()) {
             do {
@@ -96,7 +96,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<Cache> getCompletedCaches() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CACHES, new String[]{KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED},
-                KEY_COMPLETED + "=?", new String[]{String.valueOf(true)}, null, null, KEY_TITLE + "DESC", null);
+                KEY_COMPLETED + "=?", new String[]{String.valueOf(true)}, null, null, KEY_TITLE + " DESC", null);
         ArrayList<Cache> caches = new ArrayList<Cache>();
         if (cursor.moveToFirst()) {
             do {
@@ -115,7 +115,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CACHES, new String[]{KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED},
                 KEY_LATITUDE + "<=? AND " + KEY_LONGITUDE + "<=? AND " + KEY_LATITUDE + ">=? AND " + KEY_LONGITUDE + ">=?",
-                bounds, null, null, KEY_TITLE + "DESC", null);
+                bounds, null, null, KEY_TITLE + " DESC", null);
         ArrayList<Cache> caches = new ArrayList<Cache>();
         if (cursor.moveToFirst()) {
             do {
