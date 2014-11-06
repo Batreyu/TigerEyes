@@ -10,65 +10,65 @@ public class Cache {
     private float longitude;
     private boolean completed;
 
-    public Cache(String  titleIn, float latitudeIn, float longitudeIn) {
+    public Cache(String titleIn, float latitudeIn, float longitudeIn) {
         title = titleIn;
         latitude = latitudeIn;
         longitude = longitudeIn;
         completed = false;
     }
 
-    public Cache(String  titleIn, float latitudeIn, float longitudeIn, boolean completedIn) {
+    public Cache(String titleIn, float latitudeIn, float longitudeIn, boolean completedIn) {
         title = titleIn;
         latitude = latitudeIn;
         longitude = longitudeIn;
         completed = completedIn;
     }
 
-    public Cache(int idIn, String  titleIn, float latitudeIn, float longitudeIn, boolean completedIn) {
+    public Cache(int idIn, String titleIn, float latitudeIn, float longitudeIn, boolean completedIn) {
         id = idIn;
         title = titleIn;
         latitude = latitudeIn;
         longitude = longitudeIn;
         completed = completedIn;
+    }
+
+    public int getId() {
+        return (int) id;
     }
 
     public void setId(long idIn) {
         id = idIn;
     }
 
-    public int getId() {
-        return (int)id;
+    public String getTitle() {
+        return title;
     }
 
     public void setTitle(String titleIn) {
         title = titleIn;
     }
 
-    public String getTitle() {
-        return title;
+    public float getLat() {
+        return latitude;
     }
 
     public void setLat(float lat) {
         latitude = lat;
     }
 
-    public float getLat() {
-        return latitude;
+    public float getLon() {
+        return longitude;
     }
 
     public void setLon(float lon) {
         longitude = lon;
     }
 
-    public float getLon() {
-        return longitude;
+    public boolean getCompleted() {
+        return completed;
     }
 
     public void setCompleted(boolean completedIn) {
         completed = completedIn;
-    }
-
-    public boolean getCompleted() {
-        return completed;
     }
 }
