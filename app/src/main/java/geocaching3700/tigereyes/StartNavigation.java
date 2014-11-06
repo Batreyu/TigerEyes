@@ -30,9 +30,9 @@ import java.text.DecimalFormat;
  */
 public class StartNavigation extends Activity {
 
-        private LocationManager mgr=null;
-        private LocationListener listener = null;
-        private Location lastKnownLocation = null;
+    private LocationManager mgr = null;
+    private LocationListener listener = null;
+    private Location lastKnownLocation = null;
     private SharedPreferences settings;
     private Map map;
     private DecimalFormat df;
@@ -163,7 +163,7 @@ public class StartNavigation extends Activity {
         Matrix matrix = new Matrix();
 
         // Decide on how much to rotate
-        rotate = rotate % 360;
+        // rotate = rotate % 360;
 
         // Actually rotate the image
         matrix.postRotate(rotate, width, height);
@@ -228,7 +228,14 @@ public class StartNavigation extends Activity {
                 e.commit();
                 TextView bearingDegrees = (TextView) findViewById(R.id.direction);
                 bearingDegrees.setText("Direction to travel : " + df.format(bearing) + " degrees");
-
+                if (distance == 0) {
+                    //destination reached
+                    //Stop navigation updates
+                    mgr.removeUpdates(listener);
+                    //change arrow to check mark
+                    arrowImage.setImageResource(R.drawable.destination_check);
+                    return; //do not rotate
+                }
                 if (lastKnownLocation == null) {
                     return; //do nothing
                 } else { //rotate arrow
