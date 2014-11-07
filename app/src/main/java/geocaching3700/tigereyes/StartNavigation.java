@@ -3,13 +3,24 @@ package geocaching3700.tigereyes;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.hardware.GeomagneticField;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -19,23 +30,58 @@ import java.text.DecimalFormat;
  */
 public class StartNavigation extends Activity {
 
-        private LocationManager mgr=null;
-        private LocationListener listener = null;
-        private Location lastKnownLocation = null;
+    private LocationManager mgr = null;
+    private LocationListener listener = null;
+    private Location lastKnownLocation = null;
     private SharedPreferences settings;
     private Map map;
     private DecimalFormat df;
+    private ImageView arrowImage;
+    private boolean isNavigating;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+            getActionBar().hide();
             setContentView(R.layout.start_navigation);
             mgr=(LocationManager)getSystemService(LOCATION_SERVICE);
             listener = new MyLocationListener();
             mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,listener);
             settings = getSharedPreferences("settings", MODE_WORLD_WRITEABLE);
             df = new DecimalFormat("#.00");
+            isNavigating = true;
+            arrowImage = (ImageView) findViewById(R.id.arrow);
+            final ImageButton StopNav = (ImageButton) findViewById(R.id.stop);
 
+
+            StopNav.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    v.startAnimation(AnimationUtils.loadAnimation(StartNavigation.this, R.anim.click));
+                    if (isNavigating) {
+                        //stop Nav
+                        //Stop updates to location listener
+                        mgr.removeUpdates(listener);
+                        //change image
+                        //StopNav.setImageResource(R.drawable.startnav);
+                        StopNav.setBackgroundResource(R.drawable.startnav);
+                        //set flag to false
+                        isNavigating = false;
+                    } else {
+                        //start Nav
+                        //Start updates to location listener
+                        mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+                        //change image
+                        //StopNav.setImageResource(R.drawable.stopnav);
+                        StopNav.setBackgroundResource(R.drawable.stopnav);
+                        //set flag true
+                        isNavigating = true;
+                    }
+
+                }
+            });
 
             map = new Map();
 
@@ -101,11 +147,44 @@ public class StartNavigation extends Activity {
             return super.onOptionsItemSelected(item);
         }
 
+
+    private void rotateImageView(ImageView imageView, int drawable, float rotate) {
+
+        // Decode the drawable into a bitmap
+        Bitmap bitmapOrg = BitmapFactory.decodeResource(getResources(),
+                drawable);
+
+        // Get the width/height of the drawable
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int width = bitmapOrg.getWidth(), height = bitmapOrg.getHeight();
+
+        // Initialize a new Matrix
+        Matrix matrix = new Matrix();
+
+        // Decide on how much to rotate
+        // rotate = rotate % 360;
+
+        // Actually rotate the image
+        matrix.postRotate(rotate, width, height);
+
+        // recreate the new Bitmap via a couple conditions
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmapOrg, 0, 0, width, height, matrix, true);
+        //BitmapDrawable bmd = new BitmapDrawable( rotatedBitmap );
+
+        //imageView.setImageBitmap( rotatedBitmap );
+        imageView.setImageDrawable(new BitmapDrawable(getResources(), rotatedBitmap));
+        imageView.setScaleType(ImageView.ScaleType.CENTER);
+    }
+
+
         private class MyLocationListener implements LocationListener{
             //On location change must update current coords, bearing, and distance
             @Override
             public void onLocationChanged(final Location location) {
                 lastKnownLocation = location;
+
+                //set new information across app in settings
 
                 String longitude = "Longitude: " + location.getLongitude();
                 //Log.v(TAG, longitude);
@@ -149,6 +228,38 @@ public class StartNavigation extends Activity {
                 e.commit();
                 TextView bearingDegrees = (TextView) findViewById(R.id.direction);
                 bearingDegrees.setText("Direction to travel : " + df.format(bearing) + " degrees");
+                if (distance == 0) {
+                    //destination reached
+                    //Stop navigation updates
+                    mgr.removeUpdates(listener);
+                    //change arrow to check mark
+                    arrowImage.setImageResource(R.drawable.destination_check);
+                    return; //do not rotate
+                }
+                if (lastKnownLocation == null) {
+                    return; //do nothing
+                } else { //rotate arrow
+
+
+                    GeomagneticField geoField = new GeomagneticField(Double
+                            .valueOf(lastKnownLocation.getLatitude()).floatValue(), Double
+                            .valueOf(lastKnownLocation.getLongitude()).floatValue(),
+                            Double.valueOf(lastKnownLocation.getAltitude()).floatValue(),
+                            System.currentTimeMillis()
+                    );
+
+                    bearing -= geoField.getDeclination(); // converts magnetic north into true north
+
+                    // If the bearing is smaller than 0, add 360 to get the rotation clockwise.
+                    if (bearing < 0) {
+                        bearing = bearing + 360;
+                    }
+
+                    float fDir = (float) bearing;
+                    rotateImageView(arrowImage, R.drawable.arrow, fDir);
+                    arrowImage.setRotation(fDir);
+                }
+
             }
 
             @Override
@@ -164,6 +275,8 @@ public class StartNavigation extends Activity {
             public void onStatusChanged(final String provider, final int status, final Bundle extras) {
 
             }
+
+
         };
     }
 
