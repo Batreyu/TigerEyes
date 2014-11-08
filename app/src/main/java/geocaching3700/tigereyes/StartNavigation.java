@@ -33,7 +33,7 @@ public class StartNavigation extends Activity {
     private LocationManager mgr = null;
     private LocationListener listener = null;
     private Location lastKnownLocation = null;
-    private SharedPreferences settings;
+    public SharedPreferences settings;
     private Map map;
     private DecimalFormat df;
     private ImageView arrowImage;
@@ -147,6 +147,10 @@ public class StartNavigation extends Activity {
             return super.onOptionsItemSelected(item);
         }
 
+    public boolean getNavigating() {
+        return isNavigating;
+    }
+
 
     private void rotateImageView(ImageView imageView, int drawable, float rotate) {
 
@@ -177,6 +181,9 @@ public class StartNavigation extends Activity {
         imageView.setScaleType(ImageView.ScaleType.CENTER);
     }
 
+        public void changeLocation(Location location) {
+            listener.onLocationChanged(location);
+        }
 
         private class MyLocationListener implements LocationListener{
             //On location change must update current coords, bearing, and distance
@@ -279,5 +286,3 @@ public class StartNavigation extends Activity {
 
         };
     }
-
-
