@@ -25,7 +25,7 @@ public class CacheListLazyAdapter extends ArrayAdapter<Cache> {
     private int listitem;
     private ArrayList<Cache> caches;
     private Context context;
-    private DatabaseHandler db;
+    private DatabaseHandler dbh;
 //public ImageLoader imageLoader;
 
     public CacheListLazyAdapter(Context context, int textViewResourceId, ArrayList<Cache> objects) {
@@ -85,7 +85,7 @@ public class CacheListLazyAdapter extends ArrayAdapter<Cache> {
                     @Override
 
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        DatabaseHandler dbh = new DatabaseHandler(context);
+                        dbh = new DatabaseHandler(context);
                         dbh.deleteCache(thisCache);
                         caches = dbh.getCaches();
                         notifyDataSetChanged();

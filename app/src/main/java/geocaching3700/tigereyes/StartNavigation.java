@@ -19,9 +19,9 @@ import java.text.DecimalFormat;
  */
 public class StartNavigation extends Activity {
 
-        private LocationManager mgr=null;
-        private LocationListener listener = null;
-        private Location lastKnownLocation = null;
+    private LocationManager mgr=null;
+    private LocationListener listener = null;
+    private Location lastKnownLocation = null;
     private SharedPreferences settings;
     private Map map;
     private DecimalFormat df;
