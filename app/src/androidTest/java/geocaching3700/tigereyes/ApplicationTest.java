@@ -4,15 +4,6 @@ import android.app.Application;
 import android.location.Location;
 import android.test.ApplicationTestCase;
 
-/*
-        -startNavigationTest - own file
-        -storeCurrentLocationTest
-        -reachDestinationTest
-    viewGalleryTest----
-        -navigateToCacheTest - own file
-        -stopNavigationTest
- */
-
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */

@@ -181,6 +181,9 @@ public class StartNavigation extends Activity {
         imageView.setScaleType(ImageView.ScaleType.CENTER);
     }
 
+        public void changeLocation(Location location) {
+            listener.onLocationChanged(location);
+        }
 
         private class MyLocationListener implements LocationListener{
             //On location change must update current coords, bearing, and distance
