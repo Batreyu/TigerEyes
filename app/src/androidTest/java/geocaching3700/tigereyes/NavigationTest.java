@@ -9,11 +9,11 @@ import android.widget.TextView;
 /**
  * Created by Kyle on 11/7/2014.
  */
-public class StartNavigationTest extends ActivityInstrumentationTestCase2<StartNavigation> {
+public class NavigationTest extends ActivityInstrumentationTestCase2<StartNavigation> {
 
     private StartNavigation mStartNavigation;
 
-    public StartNavigationTest() {
+    public NavigationTest() {
         super(StartNavigation.class);
         mStartNavigation = new StartNavigation();
         testPreconditions();
