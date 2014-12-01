@@ -64,17 +64,18 @@ public class StartNavigation extends Activity {
                         //stop Nav
                         //Stop updates to location listener
                         mgr.removeUpdates(listener);
-                        //change image
-                        //StopNav.setImageResource(R.drawable.startnav);
+                        //change image to "Start Navigation"
                         StopNav.setBackgroundResource(R.drawable.startnav);
+                        //Return arrow to start position
+                        float r = arrowImage.getRotation();
+                        arrowImage.setRotation(360 - r);
                         //set flag to false
                         isNavigating = false;
                     } else {
                         //start Nav
                         //Start updates to location listener
                         mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
-                        //change image
-                        //StopNav.setImageResource(R.drawable.stopnav);
+                        //change image to "Stop Navigation"
                         StopNav.setBackgroundResource(R.drawable.stopnav);
                         //set flag true
                         isNavigating = true;
@@ -232,9 +233,11 @@ public class StartNavigation extends Activity {
                     //destination reached
                     //Stop navigation updates
                     mgr.removeUpdates(listener);
-                    //change arrow to check mark
+                    //change arrow to check mark, change orientation to upright
                     arrowImage.setImageResource(R.drawable.destination_check);
-                    return; //do not rotate
+                    float r = arrowImage.getRotation();
+                    arrowImage.setRotation(360 - r);
+                    return;
                 }
                 if (lastKnownLocation == null) {
                     return; //do nothing
