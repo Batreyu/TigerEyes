@@ -220,16 +220,21 @@ public class StartNavigation extends Activity {
         mgr.removeUpdates(listener);
         //change arrow to check mark, change orientation to upright
         arrowImage.setImageResource(R.drawable.check);
+
         float r = arrowImage.getRotation();
         arrowImage.setRotation(360 - r);
+        arrowImage.setAdjustViewBounds(true);
         StopNav.setBackgroundResource(R.drawable.startnav);
         //set flag to false
         isNavigating = false;
+
         //ask user to launch camera
         new AlertDialog.Builder(this)
-                .setTitle("Would you like to take a picture of your destination?")
+                .setTitle("Congratulations!")
+                .setMessage("Would you like to take a picture of your destination?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+
                         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
                         startActivity(intent);
                     }
