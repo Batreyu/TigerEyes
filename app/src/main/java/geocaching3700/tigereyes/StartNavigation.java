@@ -1,6 +1,10 @@
 package geocaching3700.tigereyes;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -19,9 +23,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 
@@ -30,14 +37,15 @@ import java.text.DecimalFormat;
  */
 public class StartNavigation extends Activity {
 
+    public SharedPreferences settings;
     private LocationManager mgr = null;
     private LocationListener listener = null;
     private Location lastKnownLocation = null;
-    public SharedPreferences settings;
     private Map map;
     private DecimalFormat df;
     private ImageView arrowImage;
     private boolean isNavigating;
+    private ImageButton StopNav;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +60,50 @@ public class StartNavigation extends Activity {
             df = new DecimalFormat("#.00");
             isNavigating = true;
             arrowImage = (ImageView) findViewById(R.id.arrow);
-            final ImageButton StopNav = (ImageButton) findViewById(R.id.stop);
 
+            StopNav = (ImageButton) findViewById(R.id.stop);
+            ImageButton saveLoc = (ImageButton) findViewById(R.id.saveloc);
+
+            saveLoc.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+
+                    final Dialog d = new Dialog(StartNavigation.this);
+                    d.setContentView(R.layout.save_location);
+                    d.setTitle("Name This Location");
+                    d.show();
+                    final EditText name = (EditText) d.findViewById(R.id.edittext);
+                    Button ok = (Button) d.findViewById(R.id.dialogButtonOK);
+                    Button cancel = (Button) d.findViewById(R.id.dialogButtonCancel);
+
+                    cancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            d.dismiss();
+                        }
+                    });
+                    ok.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Context context = getApplicationContext();
+                            DatabaseHandler dbHandler = new DatabaseHandler(context);
+                            String locName = name.getText().toString();
+                            float lat = settings.getFloat("currentLatitude", 0);
+                            float lon = settings.getFloat("currentLongitude", 0);
+                            Cache currentLocation = new Cache(locName, lat, lon);
+                            dbHandler.addCache(currentLocation);
+                            CharSequence text = "Location Saved";
+                            int duration = Toast.LENGTH_LONG;
+                            d.dismiss();
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+                        }
+                    });
+
+                }
+
+            });
 
             StopNav.setOnClickListener(new View.OnClickListener() {
 
@@ -87,31 +137,13 @@ public class StartNavigation extends Activity {
             map = new Map();
 
 
-            //GET AND display current coords
-            float curLat = settings.getFloat("currentLatitude", 0);
-            float curLon = settings.getFloat("currentLongitude", 0);
-            TextView currentCoords = (TextView) findViewById(R.id.currentCoordText);
-            String curCoordsString = "Latitude: " + Float.toString(curLat) + ", Longitude: " + Float.toString(curLon);
-            currentCoords.setText(curCoordsString);
-
-            //display destination coords in layout
-            float destLat = settings.getFloat("destLatitude", 0);
-            float destLon = settings.getFloat("destLongitude", 0);
-            TextView destCoords = (TextView) findViewById(R.id.destcoords);
-            String destCoordsString = "Latitude: " + Float.toString(destLat) + ", Longitude: " + Float.toString(destLon);
-            destCoords.setText(destCoordsString);
-
             //get and display distance
             double d = (double) settings.getLong("distance", 0);
             String unit = settings.getString("distanceUnit", "");
             TextView distance = (TextView) findViewById(R.id.distance);
-            String disString = "Distance to travel: " + df.format(d) + " " + unit;
+            String disString = df.format(d) + " " + unit;
             distance.setText(disString);
 
-            //get and display bearing
-            double bearing = (double) settings.getLong("bearing", 0);
-            TextView bearingDegrees = (TextView) findViewById(R.id.direction);
-            bearingDegrees.setText("Direction to travel : " + df.format(bearing) + " degrees");
 
         }
 
@@ -182,6 +214,39 @@ public class StartNavigation extends Activity {
         imageView.setScaleType(ImageView.ScaleType.CENTER);
     }
 
+    public void destinationReached() {
+        //destination reached
+        //Stop navigation updates
+        mgr.removeUpdates(listener);
+        //change arrow to check mark, change orientation to upright
+        arrowImage.setImageResource(R.drawable.check);
+        float r = arrowImage.getRotation();
+        arrowImage.setRotation(360 - r);
+        StopNav.setBackgroundResource(R.drawable.startnav);
+        //set flag to false
+        isNavigating = false;
+        //ask user to launch camera
+        new AlertDialog.Builder(this)
+                .setTitle("Would you like to take a picture of your destination?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+
+                    }
+                })
+                .show();
+
+
+        return;
+
+    }
+
         public void changeLocation(Location location) {
             listener.onLocationChanged(location);
         }
@@ -198,8 +263,7 @@ public class StartNavigation extends Activity {
                 //Log.v(TAG, longitude);
                 String latitude = "Latitude: " + location.getLatitude();
                 //Log.v(TAG, latitude);
-                TextView currentCoords = (TextView) findViewById(R.id.currentCoordText);
-                currentCoords.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+
 
                 SharedPreferences.Editor prefEditor = settings.edit();
                 prefEditor.putFloat("currentLatitude", (float) location.getLatitude());
@@ -225,7 +289,7 @@ public class StartNavigation extends Activity {
                 e.commit();
 
                 //display distance in layout
-                String distanceString = "Distance to travel: " + df.format(distance) + " " + distUnit;
+                String distanceString = df.format(distance) + " " + distUnit;
                 TextView distanceDisplay = (TextView) findViewById(R.id.distance);
                 distanceDisplay.setText(distanceString);
 
@@ -234,16 +298,10 @@ public class StartNavigation extends Activity {
                 e = settings.edit();
                 e.putLong("bearing", (long) bearing);
                 e.commit();
-                TextView bearingDegrees = (TextView) findViewById(R.id.direction);
-                bearingDegrees.setText("Direction to travel : " + df.format(bearing) + " degrees");
-                if (distance == 0) {
-                    //destination reached
-                    //Stop navigation updates
-                    mgr.removeUpdates(listener);
-                    //change arrow to check mark, change orientation to upright
-                    arrowImage.setImageResource(R.drawable.destination_check);
-                    float r = arrowImage.getRotation();
-                    arrowImage.setRotation(360 - r);
+
+                //Destination Reached
+                if (distUnit.equals("feet") && distance <= 5) {
+                    destinationReached();
                     return;
                 }
                 if (lastKnownLocation == null) {
