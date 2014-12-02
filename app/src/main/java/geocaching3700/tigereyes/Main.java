@@ -2,6 +2,7 @@ package geocaching3700.tigereyes;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +15,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -56,8 +60,71 @@ public class Main extends Activity {
             @Override
             public void onClick(View v) {
                 v.startAnimation(AnimationUtils.loadAnimation(Main.this, R.anim.click));
-                Intent intent = new Intent(Main.this, StartNavigation.class);
-                startActivity(intent);
+                //OptionMenuWithDialog d = new OptionMenuWithDialog();
+                //Intent intent = new Intent(Main.this, OptionMenuWithDialog.class);
+                //startActivity(intent);
+                final String[] option = new String[]{"Enter Coordinates", "My Closest Cache", "Choose From My Locations"};
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(Main.this,
+                        android.R.layout.select_dialog_item, option);
+                AlertDialog.Builder builder = new AlertDialog.Builder(Main.this);
+
+                builder.setTitle("Select Option");
+                builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) { //Enter Coordinates
+                            final Dialog d = new Dialog(Main.this);
+                            d.setContentView(R.layout.enter_coords);
+                            d.setTitle("Enter Coordinates");
+                            d.show();
+                            final EditText latText = (EditText) d.findViewById(R.id.lat);
+                            final EditText lonText = (EditText) d.findViewById(R.id.lon);
+                            Button ok = (Button) d.findViewById(R.id.dialogButtonOK);
+                            Button cancel = (Button) d.findViewById(R.id.dialogButtonCancel);
+
+                            cancel.setOnClickListener(new OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    d.dismiss();
+                                }
+                            });
+                            ok.setOnClickListener(new OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //check if coords are numbers
+                                    try {
+                                        float latfloat = Float.parseFloat(latText.getText().toString());
+                                        float lonfloat = Float.parseFloat(lonText.getText().toString());
+                                        //set valid coords to destination and launch start nav
+                                        SharedPreferences.Editor e = settings.edit();
+                                        e.putFloat("destLatitude", latfloat);
+                                        e.putFloat("destLongitude", lonfloat);
+                                        e.commit();
+                                        d.dismiss();
+                                        Intent intent = new Intent(Main.this, StartNavigation.class);
+                                        startActivity(intent);
+
+                                    } catch (NumberFormatException e) {
+                                        CharSequence text = "You must enter valid numerical coordinates";
+                                        int duration = Toast.LENGTH_LONG;
+                                        Toast toast = Toast.makeText(getApplicationContext(), text, duration);
+                                        toast.show();
+                                    }
+                                }
+                            });
+
+                        } else if (which == 1) { //Closest Cache
+
+
+                        } else if (which == 2) { // My Locations
+                            Intent intent = new Intent(Main.this, MyLocation.class);
+                            startActivity(intent);
+                        }
+
+                    }
+                });
+                final AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
         myLocations.setOnClickListener(new OnClickListener() {
@@ -67,6 +134,20 @@ public class Main extends Activity {
                 v.startAnimation(AnimationUtils.loadAnimation(Main.this, R.anim.click));
                 Intent intent = new Intent(Main.this, MyLocation.class);
                 startActivity(intent);
+            }
+        });
+
+        viewGallery.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                v.startAnimation(AnimationUtils.loadAnimation(Main.this, R.anim.click));
+                final int RESULT_GALLERY = 0;
+
+                Intent galleryIntent = new Intent(
+                        Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(galleryIntent, RESULT_GALLERY);
             }
         });
     }

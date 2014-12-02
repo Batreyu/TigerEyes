@@ -8,49 +8,17 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".Main">
 
-    <TextView
-        android:id="@+id/currentLocationText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="your current location is: " />
 
-    <TextView
-        android:id="@+id/currentCoordText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/currentLocationText"
-        android:paddingBottom="15dp"
-        android:text="Please Wait............." />
-
-    <TextView
-        android:id="@+id/destText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/currentCoordText"
-        android:text="your destination is:" />
-
-    <TextView
-        android:id="@+id/destcoords"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/destText"
-        android:paddingBottom="15dp"
-        android:text="Latitude: 0.0, Longitude: 0.0" />
-
-    <TextView
-        android:id="@+id/direction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/destcoords"
-        android:text="Direction to travel: ___" />
 
     <TextView
         android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/direction"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:lines="2"
         android:paddingBottom="15dp"
-        android:text="Distance to travel: ___" />
+        android:text="Distance Remaining: ___" />
 
     <ImageView
         android:id="@+id/arrow"
@@ -58,16 +26,29 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/distance"
         android:layout_centerInParent="true"
+        android:layout_margin="25dip"
         android:rotation="360.0"
+
         android:src="@drawable/arrow" />
 
     <ImageButton
         android:id="@+id/stop"
-        android:layout_width="fill_parent"
+        android:layout_width="225dip"
+        android:layout_height="50dip"
+        android:layout_above="@+id/saveloc"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="5dip"
+        android:layout_marginTop="20dip"
+        android:background="@drawable/stopnav" />
+
+    <ImageButton
+        android:id="@+id/saveloc"
+        android:layout_width="225dip"
         android:layout_height="50dip"
         android:layout_alignParentBottom="true"
+
         android:layout_centerInParent="true"
-        android:background="@drawable/stopnav" />
+        android:background="@drawable/saveloc" />
 
 
 </RelativeLayout>

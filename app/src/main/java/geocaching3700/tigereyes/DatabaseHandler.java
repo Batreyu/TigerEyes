@@ -109,6 +109,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return caches;
     }
 
+
     //Getting all caches within radius (in degrees)
     //Should return a square radius, not a circle radius...it's not perfect :(
     public ArrayList<Cache> getWithin(String[] bounds) {
