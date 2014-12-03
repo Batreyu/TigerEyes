@@ -36,7 +36,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_CACHES_TABLE = "CREATE TABLE " + TABLE_CACHES + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TITLE + " TEXT," + KEY_LATITUDE + " TEXT," +
                 KEY_LONGITUDE + " TEXT," + KEY_COMPLETED + " TEXT" + ")";
+
         db.execSQL(CREATE_CACHES_TABLE);
+        // db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(KEY_TITLE, "Bridge? Over Troubled Water");
@@ -87,7 +89,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_COMPLETED, "false");
         db.insert(TABLE_CACHES, null, values);
 
-        db.close();
+        // db.close();
     }
 
 
@@ -234,8 +236,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             d = d / 1.609344; // d from km to mi
             caches.get(i).setDistance(d);
         }
-
-        ArrayList<Cache> newCaches = new ArrayList<Cache>(caches.size());
+        // int num = caches.size();
+        // ArrayList<Cache> newCaches = new ArrayList<Cache>(num);
+        //newCaches.ensureCapacity(num);
+        ArrayList<Cache> newCaches = (ArrayList<Cache>) caches.clone();
         newCaches.set(0, caches.get(0));
         //insertion sort -- can change it later to more efficient
         for (int i = 1; i < caches.size(); i++) {

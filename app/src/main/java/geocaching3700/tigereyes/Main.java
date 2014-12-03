@@ -3,6 +3,7 @@ package geocaching3700.tigereyes;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +21,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
 public class Main extends Activity {
@@ -44,11 +47,13 @@ public class Main extends Activity {
         SharedPreferences.Editor e = settings.edit();
         e.putFloat("destLatitude", 0);
         e.putFloat("destLongitude", 0);
+        // e.putFloat("currentLatitude", 0);
+        // e.putFloat("currentLongitude", 0);
         e.putLong("bearing", 0);
         e.putLong("distance", 0);
         e.putString("distanceUnit", "feet");
         e.commit();
-
+        DatabaseHandler dbHandler = new DatabaseHandler(getApplicationContext());
         //initialize buttons with layout elements
         startNav = (ImageButton) findViewById(R.id.start_navigation);
         myLocations = (ImageButton) findViewById(R.id.locations);
@@ -114,7 +119,20 @@ public class Main extends Activity {
                             });
 
                         } else if (which == 1) { //Closest Cache
-
+                            Context context = getApplicationContext();
+                            DatabaseHandler dbHandler = new DatabaseHandler(context);
+                            ArrayList<Cache> caches = dbHandler.getCaches(settings.getFloat("currentLatitude", 0), settings.getFloat("currentLongitude", 0));
+                            Cache closest = caches.get(0); //closest cache
+                            //set destination coords
+                            float latfloat = closest.getLat();
+                            float lonfloat = closest.getLon();
+                            SharedPreferences.Editor e = settings.edit();
+                            e.putFloat("destLatitude", latfloat);
+                            e.putFloat("destLongitude", lonfloat);
+                            e.commit();
+                            //launch navigation
+                            Intent intent = new Intent(Main.this, StartNavigation.class);
+                            startActivity(intent);
 
                         } else if (which == 2) { // My Locations
                             Intent intent = new Intent(Main.this, MyLocation.class);
