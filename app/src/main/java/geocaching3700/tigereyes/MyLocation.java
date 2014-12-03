@@ -54,7 +54,7 @@ public class MyLocation extends Activity {
         settings = getSharedPreferences("settings", MODE_WORLD_WRITEABLE);
         mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
         dbHandler = new DatabaseHandler(context);
-        caches = dbHandler.getCaches();
+        caches = dbHandler.getCaches(settings.getFloat("currentLatitude", 0), settings.getFloat("currentLongitude", 0));
         final CacheListLazyAdapter adapter= new CacheListLazyAdapter(
                 this,
                 android.R.layout.simple_list_item_1,
@@ -64,7 +64,7 @@ public class MyLocation extends Activity {
             public void run() {
                 //reload content
                 caches.clear();
-                caches.addAll(dbHandler.getCaches());
+                caches.addAll(dbHandler.getCaches(settings.getFloat("currentLatitude", 0), settings.getFloat("currentLongitude", 0)));
                 adapter.notifyDataSetChanged();
                 listView.invalidateViews();
                 listView.refreshDrawableState();

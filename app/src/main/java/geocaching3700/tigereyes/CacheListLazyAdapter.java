@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 
 public class CacheListLazyAdapter extends ArrayAdapter<Cache> {
     private static LayoutInflater inflater = null;
+    public SharedPreferences settings;
     private Activity activity;
     private int listitem;
     private ArrayList<Cache> caches;
@@ -32,6 +34,7 @@ public class CacheListLazyAdapter extends ArrayAdapter<Cache> {
         super(context, textViewResourceId, objects);
         this.context = context;
         caches = objects;
+        settings = context.getSharedPreferences("settings", context.MODE_WORLD_WRITEABLE);
 
     }
 
@@ -87,7 +90,7 @@ public class CacheListLazyAdapter extends ArrayAdapter<Cache> {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dbh = new DatabaseHandler(context);
                         dbh.deleteCache(thisCache);
-                        caches = dbh.getCaches();
+                        caches = dbh.getCaches(settings.getFloat("currentLatitude", 0), settings.getFloat("currentLongitude", 0));
                         notifyDataSetChanged();
                         dialogInterface.dismiss();
                     }
