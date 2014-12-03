@@ -15,7 +15,6 @@ public class NavigationTest extends ActivityInstrumentationTestCase2<StartNaviga
 
     public NavigationTest() {
         super(StartNavigation.class);
-        mStartNavigation = new StartNavigation();
         testPreconditions();
         navigateToCacheTest();
         onLocationChangedTest();

@@ -8,6 +8,7 @@ public class Cache {
     private String title;
     private float latitude;
     private float longitude;
+    private double distance;
     private boolean completed;
 
     public Cache(String titleIn, float latitudeIn, float longitudeIn) {
@@ -15,6 +16,7 @@ public class Cache {
         latitude = latitudeIn;
         longitude = longitudeIn;
         completed = false;
+        distance = 0;
     }
 
     public Cache(String titleIn, float latitudeIn, float longitudeIn, boolean completedIn) {
@@ -22,6 +24,7 @@ public class Cache {
         latitude = latitudeIn;
         longitude = longitudeIn;
         completed = completedIn;
+        distance = 0;
     }
 
     public Cache(int idIn, String titleIn, float latitudeIn, float longitudeIn, boolean completedIn) {
@@ -30,6 +33,7 @@ public class Cache {
         latitude = latitudeIn;
         longitude = longitudeIn;
         completed = completedIn;
+        distance = 0;
     }
 
     public int getId() {
@@ -70,5 +74,13 @@ public class Cache {
 
     public void setCompleted(boolean completedIn) {
         completed = completedIn;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distanceIn) {
+        distance = distanceIn;
     }
 }
