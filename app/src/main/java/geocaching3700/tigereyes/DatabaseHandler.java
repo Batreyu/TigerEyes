@@ -37,6 +37,57 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TITLE + " TEXT," + KEY_LATITUDE + " TEXT," +
                 KEY_LONGITUDE + " TEXT," + KEY_COMPLETED + " TEXT" + ")";
         db.execSQL(CREATE_CACHES_TABLE);
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_TITLE, "Bridge? Over Troubled Water");
+        values.put(KEY_LATITUDE, "32.5037667");
+        values.put(KEY_LONGITUDE, "-085.5946500");
+        values.put(KEY_COMPLETED, "false");
+        db.insert(TABLE_CACHES, null, values);
+
+        values.clear();
+        values.put(KEY_TITLE, "Eye of the Needle");
+        values.put(KEY_LATITUDE, "32.4854667");
+        values.put(KEY_LONGITUDE, "-085.5850000");
+        values.put(KEY_COMPLETED, "false");
+        db.insert(TABLE_CACHES, null, values);
+
+        values.clear();
+        values.put(KEY_TITLE, "Monkey Business");
+        values.put(KEY_LATITUDE, "32.4846667");
+        values.put(KEY_LONGITUDE, "-085.6075333");
+        values.put(KEY_COMPLETED, "false");
+        db.insert(TABLE_CACHES, null, values);
+
+        values.clear();
+        values.put(KEY_TITLE, "ASSIGNMENT: Fire Tower");
+        values.put(KEY_LATITUDE, "32.4598000");
+        values.put(KEY_LONGITUDE, "-085.6228333");
+        values.put(KEY_COMPLETED, "false");
+        db.insert(TABLE_CACHES, null, values);
+
+        values.clear();
+        values.put(KEY_TITLE, "Revenge of the Cache Monkey");
+        values.put(KEY_LATITUDE, "32.4376833");
+        values.put(KEY_LONGITUDE, "-085.6356833");
+        values.put(KEY_COMPLETED, "false");
+        db.insert(TABLE_CACHES, null, values);
+
+        values.clear();
+        values.put(KEY_TITLE, "Rocky");
+        values.put(KEY_LATITUDE, "32.4401167");
+        values.put(KEY_LONGITUDE, "-085.6397167");
+        values.put(KEY_COMPLETED, "false");
+        db.insert(TABLE_CACHES, null, values);
+
+        values.clear();
+        values.put(KEY_TITLE, "CC's Cache");
+        values.put(KEY_LATITUDE, "32.4413667");
+        values.put(KEY_LONGITUDE, "-085.6539667");
+        values.put(KEY_COMPLETED, "false");
+        db.insert(TABLE_CACHES, null, values);
+
+        db.close();
     }
 
 
@@ -75,8 +126,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return null;
     }
 
+    public Cache getClosestCache(float lat, float lon) {
+        ArrayList<Cache> caches = getCaches(lat, lon);
+        return caches.get(0);
+    }
+
     // Getting all caches
-    public ArrayList<Cache> getCaches() {
+    public ArrayList<Cache> getCaches(float lat1, float lon1) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CACHES, new String[]{KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED}, null,
                 null, null, null, KEY_TITLE + " DESC", null);
@@ -89,11 +145,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 caches.add(cache);
             } while (cursor.moveToNext());
         }
-        return caches;
+
+        return sortByDistance(caches, lat1, lon1);
     }
 
     //Get all uncompleted caches
-    public ArrayList<Cache> getCompletedCaches() {
+    public ArrayList<Cache> getCompletedCaches(float lat1, float lon1) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CACHES, new String[]{KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED},
                 KEY_COMPLETED + "=?", new String[]{String.valueOf(true)}, null, null, KEY_TITLE + " DESC", null);
@@ -106,13 +163,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 caches.add(cache);
             } while (cursor.moveToNext());
         }
-        return caches;
+        return sortByDistance(caches, lat1, lon1);
     }
 
 
     //Getting all caches within radius (in degrees)
     //Should return a square radius, not a circle radius...it's not perfect :(
-    public ArrayList<Cache> getWithin(String[] bounds) {
+    public ArrayList<Cache> getWithin(String[] bounds, float lat1, float lon1) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CACHES, new String[]{KEY_ID, KEY_TITLE, KEY_LATITUDE, KEY_LONGITUDE, KEY_COMPLETED},
                 KEY_LATITUDE + "<=? AND " + KEY_LONGITUDE + "<=? AND " + KEY_LATITUDE + ">=? AND " + KEY_LONGITUDE + ">=?",
@@ -126,7 +183,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 caches.add(cache);
             } while (cursor.moveToNext());
         }
-        return caches;
+        return sortByDistance(caches, lat1, lon1);
     }
 
     // Updating single cache
@@ -159,5 +216,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         int deleted = db.delete(TABLE_CACHES, KEY_COMPLETED + "=?", new String[]{String.valueOf(true)});
         return deleted;
+    }
+
+    private ArrayList<Cache> sortByDistance(ArrayList<Cache> caches, float lat1, float lon1) {
+        //get distances
+        double R = 6371; // km
+        for (int i = 0; i < caches.size(); i++) {
+            float lat2 = caches.get(i).getLat();
+            float lon2 = caches.get(i).getLon();
+            double dLat = Math.toRadians(lat2 - lat1); // get the distance between lats
+            double dLon = Math.toRadians(lon2 - lon1); // get the distance between longs
+            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); // taken from yourhomenow.com
+            double d = R * c;
+            d = d / 1.609344; // d from km to mi
+            caches.get(i).setDistance(d);
+        }
+
+        ArrayList<Cache> newCaches = new ArrayList<Cache>(caches.size());
+        newCaches.set(0, caches.get(0));
+        //insertion sort -- can change it later to more efficient
+        for (int i = 1; i < caches.size(); i++) {
+            Cache cache = caches.get(i);
+            int j;
+            for (j = i; j > 0 && newCaches.get(j-1).getDistance() > cache.getDistance(); j--) {
+                newCaches.set(j, newCaches.get(j-1));
+            }
+            newCaches.set(j, cache);
+        }
+        return newCaches;
     }
 }
